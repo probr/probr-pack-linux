@@ -36,7 +36,7 @@ func (scenario *scenarioState) gNomeDisplayManager() error {
 	//		config.Vars.ServicePacks.Ubuntu.Password,
 	//		config.Vars.ServicePacks.Ubuntu.Ip,
 	//		"22")
-	response := ConnectAndRunShellCmd("ls -arlt", "ansibleuser", "password@123", "172.17.60.136", "22")
+	response := ConnectAndRunShellCmd("ls -arlt", "", "", "", "")
 	fmt.Println("Response----------------------->", response)
 	if len(response) == 0 {
 		err = errors.New("not able to connect to the VM")
