@@ -54,11 +54,11 @@ func (sp *ServicePack) RunProbes() error {
 
 // main is executed when this file is called as a binary or `go run`
 func main() {
-	versionCmd, runCmd := setFlags()
-	handleCommands(versionCmd, runCmd)
+	versionCmd, runCmd, ipCmd := setFlags()
+	handleCommands(versionCmd, runCmd, ipCmd)
 }
 
-func setFlags() (versionCmd, runCmd *flag.FlagSet) {
+func setFlags() (versionCmd, runCmd, ipCmd *flag.FlagSet) {
 	// > probr version [-v]
 	versionCmd = flag.NewFlagSet("version", flag.ExitOnError)
 	config.Vars.Verbose = *versionCmd.Bool("v", false, "Display extended version information") // TODO: Harness '-v' in the standard probr execution
@@ -66,14 +66,19 @@ func setFlags() (versionCmd, runCmd *flag.FlagSet) {
 	// > probr
 	runCmd = flag.NewFlagSet("run", flag.ExitOnError)
 	runCmd.StringVar(&config.Vars.VarsFile, "varsfile", "", "path to config file")
+
+	ipCmd = flag.NewFlagSet("ip", flag.ExitOnError)
+	runCmd.StringVar(&config.Vars.ServicePacks.Ubuntu.Ip, "ip", "", "IP of the VM for which accessment is to run")
+
 	return
 }
 
-func handleCommands(versionCmd, runCmd *flag.FlagSet) {
+func handleCommands(versionCmd, runCmd, ipCmd *flag.FlagSet) {
 	subCommand := ""
 	if len(os.Args) > 1 {
 		subCommand = os.Args[1]
 	}
+	fmt.Println(ipCmd.Args())
 	switch subCommand {
 	case "version":
 		versionCmd.Parse(os.Args[2:])

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cucumber/godog"
+	conf "github.com/probr/probr-pack-ubuntu/internal/config"
 	"github.com/probr/probr-pack-ubuntu/internal/summary"
 	audit "github.com/probr/probr-sdk/audit"
 	"github.com/probr/probr-sdk/probeengine"
@@ -18,7 +19,8 @@ type probeStruct struct{}
 
 // scenarioState holds the steps and state for any scenario in this probe
 type scenarioState struct {
-	name        string
+	name string
+	//Session     *ssh.Session
 	currentStep string
 	audit       *audit.Scenario
 	probe       *audit.Probe
@@ -55,12 +57,9 @@ func (probe probeStruct) ProbeInitialize(ctx *godog.TestSuiteContext) {
 
 // ScenarioInitialize provides initialization logic before each scenario is executed
 func (probe probeStruct) ScenarioInitialize(ctx *godog.ScenarioContext) {
-
 	ctx.BeforeScenario(func(s *godog.Scenario) {
-		scenario.name = s.Name
-		scenario.probe = summary.State.GetProbeLog(probe.Name())
-		scenario.audit = summary.State.GetProbeLog(probe.Name()).InitializeAuditor(s.Name, s.Tags)
-		probeengine.LogScenarioStart(s)
+
+		beforeScenario(&scenario, probe.Name(), s)
 	})
 
 	ctx.BeforeStep(func(st *godog.Step) {
@@ -68,50 +67,57 @@ func (probe probeStruct) ScenarioInitialize(ctx *godog.ScenarioContext) {
 	})
 
 	// Background
-	//ctx.Step(`^GNOME Display Manager is disabled$`, scenario.gNomeDisplayManager)
-	ctx.Step(`^an Ubuntu VM must be up$`, scenario.gNomeDisplayManager())
-	ctx.Step(`^gnome display Manager is disabled$`, scenario.gNomeDisplayManager())
+
+	ctx.Step(`^ensure SSH root login is disabled$`, scenario.ensureSSHRootLoginIsDisabled)
+	ctx.Step(`^Ensure ufw firewall is configured`, scenario.ensureUfwFirewallIsConfigured)
 
 	ctx.AfterStep(func(st *godog.Step, err error) {
 		scenario.currentStep = ""
 	})
 
 	ctx.AfterScenario(func(s *godog.Scenario, err error) {
+		//scenario.Session.Close()
 		probeengine.LogScenarioEnd(s)
 	})
 
 }
 
-func ConnectAndRunShellCmd(command, username, password, hostname, port string) string {
+func ConnectAndRunShellCmd(command string, session ssh.Session) (string, error) {
+	fmt.Println("Executing command ", command)
+	var buff bytes.Buffer
+	session.Stdout = &buff
+	if err := session.Run(command); err != nil {
+		return "", err
+	}
+	return buff.String(), nil
+}
 
+func beforeScenario(s *scenarioState, probeName string, gs *godog.Scenario) {
+	s.name = gs.Name
+	//s.Session = GetSession()
+	s.probe = summary.State.GetProbeLog(probeName)
+	s.audit = summary.State.GetProbeLog(probeName).InitializeAuditor(s.name, gs.Tags)
+	probeengine.LogScenarioStart(gs)
+}
+
+func GetSession() *ssh.Session {
 	config := &ssh.ClientConfig{
-		User: username,
-		Auth: []ssh.AuthMethod{ssh.Password(password)},
+		User: conf.Vars.ServicePacks.Ubuntu.Username,
+		Auth: []ssh.AuthMethod{ssh.Password(conf.Vars.ServicePacks.Ubuntu.Password)},
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
 	}
-	fmt.Println("\nConnecting to ", hostname, port)
-
-	hostaddress := strings.Join([]string{hostname, port}, ":")
+	hostaddress := strings.Join([]string{conf.Vars.ServicePacks.Ubuntu.Ip, conf.Vars.ServicePacks.Ubuntu.Port}, ":")
 	client, err := ssh.Dial("tcp", hostaddress, config)
 	if err != nil {
+		fmt.Println("Error---------------->", err)
 		panic(err.Error())
 	}
 	session, err := client.NewSession()
 	if err != nil {
 		panic(err.Error())
 	}
-	defer session.Close()
-	fmt.Println("To exit this program, hit Control-C")
-	fmt.Printf("Enter command to execute on %s : ", hostname)
-	fmt.Println("Executing command ", command)
-	var buff bytes.Buffer
-	session.Stdout = &buff
-	if err := session.Run(command); err != nil {
-		panic(err.Error())
-	}
-
-	return buff.String()
+	return session
 
 }

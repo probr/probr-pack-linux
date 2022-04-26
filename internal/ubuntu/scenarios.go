@@ -8,12 +8,10 @@ import (
 	"github.com/probr/probr-sdk/utils"
 )
 
-func (scenario *scenarioState) gNomeDisplayManager() error {
+func (scenario *scenarioState) ensureUfwFirewallIsConfigured() error {
 	// Standard auditing logic to ensures panics are also audited
 	stepTrace, payload, err := utils.AuditPlaceholders()
-	fmt.Println("GNOEM display manageer =======================================", scenario.currentStep)
 	defer func() {
-		fmt.Println("audit=================>", scenario.audit)
 		if panicErr := recover(); panicErr != nil {
 			err = utils.ReformatError("[ERROR] Unexpected behavior occured: %s", panicErr)
 		}
@@ -21,26 +19,44 @@ func (scenario *scenarioState) gNomeDisplayManager() error {
 	}()
 
 	stepTrace.WriteString("Validate that test is intended to pass; ")
-
 	payload = struct {
-		UserName string
-		Password string
-		Ip       string
+		Ip string
 	}{
-		config.Vars.ServicePacks.Ubuntu.Username,
-		config.Vars.ServicePacks.Ubuntu.Password,
 		config.Vars.ServicePacks.Ubuntu.Ip,
 	}
-	fmt.Println("config.Vars.ServicePacks.Ubuntu.Username===============>", config.Vars.ServicePacks.Ubuntu.Username)
-	//	response := ConnectAndRunShellCmd("ls -arlt", config.Vars.ServicePacks.Ubuntu.Username,
-	//		config.Vars.ServicePacks.Ubuntu.Password,
-	//		config.Vars.ServicePacks.Ubuntu.Ip,
-	//		"22")
-	response := ConnectAndRunShellCmd("ls -arlt", "ansibleuser", "password@123", "172.17.60.136", "22")
-	fmt.Println("Response----------------------->", response)
-	if len(response) == 0 {
-		err = errors.New("not able to connect to the VM")
-	}
-	return err
+	session := GetSession()
+	_, err1 := ConnectAndRunShellCmd("sudo ufw status | grep Status", *session)
 
+	if err1 != nil {
+		return err
+	}
+	session.Close()
+	return errors.New("firewall is not able to connect to the VM")
+}
+
+func (scenario *scenarioState) ensureSSHRootLoginIsDisabled() error {
+	// Standard auditing logic to ensures panics are also audited
+	stepTrace, payload, err := utils.AuditPlaceholders()
+	defer func() {
+		if panicErr := recover(); panicErr != nil {
+			err = utils.ReformatError("[ERROR] Unexpected behavior occured: %s", panicErr)
+		}
+		scenario.audit.AuditScenarioStep(scenario.currentStep, stepTrace.String(), payload, err)
+	}()
+
+	stepTrace.WriteString("Validate that test is intended to pass; ")
+	payload = struct {
+		Ip string
+	}{
+		config.Vars.ServicePacks.Ubuntu.Ip,
+	}
+	session1 := GetSession()
+	response, _ := ConnectAndRunShellCmd("dpkg -s sudo", *session1)
+
+	fmt.Println("Response----------------------->", response)
+	if response != "inactive" {
+		return err
+	}
+	session1.Close()
+	return errors.New("not able to connect to the VM")
 }

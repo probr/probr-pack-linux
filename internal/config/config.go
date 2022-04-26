@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	sdkConfig "github.com/probr/probr-sdk/config"
@@ -14,6 +15,7 @@ var Vars varOptions
 
 // Init will set values with the content retrieved from a filepath, env vars, or defaults
 func (ctx *varOptions) Init() (err error) {
+	fmt.Println("ctx.Varsfile==============>", ctx.VarsFile)
 	if ctx.VarsFile != "" {
 		ctx.decode()
 		if err != nil {
@@ -24,8 +26,10 @@ func (ctx *varOptions) Init() (err error) {
 		log.Printf("[DEBUG] No vars file provided, unexpected behavior may occur")
 	}
 	sdkConfig.GlobalConfig.VarsFile = ctx.VarsFile
+	sdkConfig.GlobalConfig.Ip = ctx.ServicePacks.Ubuntu.Ip
+	fmt.Println("IP from args------>", sdkConfig.GlobalConfig.Ip)
 	sdkConfig.GlobalConfig.Init()
-	sdkConfig.GlobalConfig.PrepareOutputDirectory("audit", "cucumber")
+	sdkConfig.GlobalConfig.PrepareOutputDirectory(sdkConfig.GlobalConfig.Ip+"/audit", sdkConfig.GlobalConfig.Ip+"/cucumber")
 	log.Printf("[DEBUG] Config initialized by %s", utils.CallerName(1))
 	return
 }
