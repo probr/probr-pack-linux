@@ -67,7 +67,7 @@ func (probe probeStruct) ScenarioInitialize(ctx *godog.ScenarioContext) {
 	})
 
 	// Background
-
+	ctx.Step("^an Ubuntu VM must be up$", scenario.givenAnUbuntuVMMustBeUp)
 	ctx.Step(`^ensure SSH root login is disabled$`, scenario.ensureSSHRootLoginIsDisabled)
 	ctx.Step(`^Ensure ufw firewall is configured`, scenario.ensureUfwFirewallIsConfigured)
 
@@ -86,9 +86,12 @@ func ConnectAndRunShellCmd(command string, session ssh.Session) (string, error) 
 	fmt.Println("Executing command ", command)
 	var buff bytes.Buffer
 	session.Stdout = &buff
-	if err := session.Run(command); err != nil {
+	err := session.Run(command)
+	if err != nil {
+		fmt.Println("Error=======>", err)
 		return "", err
 	}
+
 	return buff.String(), nil
 }
 

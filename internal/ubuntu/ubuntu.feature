@@ -12,12 +12,7 @@ Feature: Cluster networking best practice
     @ubuntu-net-002
     Scenario:  Ensure ufw firewall is configured
       Then Ensure ufw firewall is configured
-
-   
-
-
-
   Examples:
-| TEST        | 
+| TEST            | 
 | test            | 
       

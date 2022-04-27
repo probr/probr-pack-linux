@@ -25,11 +25,10 @@ func (ctx *varOptions) Init() (err error) {
 	} else {
 		log.Printf("[DEBUG] No vars file provided, unexpected behavior may occur")
 	}
-	sdkConfig.GlobalConfig.VarsFile = ctx.VarsFile
-	sdkConfig.GlobalConfig.IP = ctx.ServicePacks.Ubuntu.Ip
-	fmt.Println("IP from args------>", sdkConfig.GlobalConfig.IP)
+
+	fmt.Println("IP from args------>", ctx.ServicePacks.Ubuntu.Ip)
 	sdkConfig.GlobalConfig.Init()
-	sdkConfig.GlobalConfig.PrepareOutputDirectory(sdkConfig.GlobalConfig.IP+"/audit", sdkConfig.GlobalConfig.IP+"/cucumber")
+	sdkConfig.GlobalConfig.PrepareOutputDirectory(ctx.ServicePacks.Ubuntu.Ip+"/audit", ctx.ServicePacks.Ubuntu.Ip+"/cucumber")
 	log.Printf("[DEBUG] Config initialized by %s", utils.CallerName(1))
 	return
 }

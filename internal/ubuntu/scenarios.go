@@ -8,6 +8,12 @@ import (
 	"github.com/probr/probr-sdk/utils"
 )
 
+func (scenario *scenarioState) givenAnUbuntuVMMustBeUp() error {
+	// Standard auditing logic to ensures panics are also audited
+	_, _, err := utils.AuditPlaceholders()
+	return err
+}
+
 func (scenario *scenarioState) ensureUfwFirewallIsConfigured() error {
 	// Standard auditing logic to ensures panics are also audited
 	stepTrace, payload, err := utils.AuditPlaceholders()
@@ -25,9 +31,9 @@ func (scenario *scenarioState) ensureUfwFirewallIsConfigured() error {
 		config.Vars.ServicePacks.Ubuntu.Ip,
 	}
 	session := GetSession()
-	_, err1 := ConnectAndRunShellCmd("sudo ufw status | grep Status", *session)
-
-	if err1 != nil {
+	response, err := ConnectAndRunShellCmd("sudo ufw status | grep Status", *session)
+	fmt.Println("Response====>", response)
+	if response == "inactive\n" {
 		return err
 	}
 	session.Close()
@@ -51,10 +57,10 @@ func (scenario *scenarioState) ensureSSHRootLoginIsDisabled() error {
 		config.Vars.ServicePacks.Ubuntu.Ip,
 	}
 	session1 := GetSession()
-	response, _ := ConnectAndRunShellCmd("dpkg -s sudo", *session1)
+	response, _ := ConnectAndRunShellCmd("dpkg -s sudo | grep Status", *session1)
 
 	fmt.Println("Response----------------------->", response)
-	if response != "inactive" {
+	if response == "Status: install ok installed\n" {
 		return err
 	}
 	session1.Close()
