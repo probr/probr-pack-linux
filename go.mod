@@ -14,4 +14,4 @@ require (
 // For Development Only
 // replace github.com/probr/probr-sdk => ../probr-sdk
 
-//replace github.com/probr/probr-sdk => ../probr-sdk
+replace github.com/probr/probr-sdk => ../probr-sdk

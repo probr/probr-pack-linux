@@ -28,7 +28,8 @@ func (ctx *varOptions) Init() (err error) {
 
 	fmt.Println("IP from args------>", ctx.ServicePacks.Ubuntu.Ip)
 	sdkConfig.GlobalConfig.Init()
-	sdkConfig.GlobalConfig.PrepareOutputDirectory(ctx.ServicePacks.Ubuntu.Ip+"/audit", ctx.ServicePacks.Ubuntu.Ip+"/cucumber")
+	sdkConfig.GlobalConfig.WriteDirectory = sdkConfig.GlobalConfig.WriteDirectory + ctx.ServicePacks.Ubuntu.Ip
+	sdkConfig.GlobalConfig.PrepareOutputDirectory("audit", "cucumber")
 	log.Printf("[DEBUG] Config initialized by %s", utils.CallerName(1))
 	return
 }
