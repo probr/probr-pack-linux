@@ -58,9 +58,9 @@ func (ctx *varOptions) Tags() string {
 }
 
 func (ctx *ubuntu) setEnvAndDefaults() {
-	setter.SetVar(&ctx.Ip, "PROBR_UBUNTU_IP", "172.17.60.136")
-	setter.SetVar(&ctx.Password, "PROBR_UBUNTU_PASSWORD", "password@123")
-	setter.SetVar(&ctx.Username, "PROBR_UBUNTU_USERNAME", "ansibleuser")
+	setter.SetVar(&ctx.Ip, "PROBR_UBUNTU_IP", "")
+	setter.SetVar(&ctx.Password, "PROBR_UBUNTU_PASSWORD", "")
+	setter.SetVar(&ctx.Username, "PROBR_UBUNTU_USERNAME", "")
 	setter.SetVar(ctx.Port, "PROBR_UBUNTU_PORT", "22")
 	setter.SetVar(&ctx.Pass, "PROBR_PASS_WIREFRAME_TESTS", "true")
 }

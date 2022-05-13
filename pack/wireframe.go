@@ -32,6 +32,13 @@ func GetProbes() []probeengine.Probe {
 
 func init() {
 	// pkger.Include is a no-op that directs the pkger tool to include the desired file or folder.
-	pkger.Include("/internal/ubuntu/ubuntu.feature")
-	pkger.Include("/internal/services/service.feature")
+	pkger.Include("/internal/access/access.feature")
+	pkger.Include("/internal/filesystem/filesystem.feature")
+	pkger.Include("/internal/firewall/firewall.feature")
+	pkger.Include("/internal/group/group.feature")
+	pkger.Include("/internal/logging/logging.feature")
+	pkger.Include("/internal/network/network.feature")
+	pkger.Include("/internal/services/services.feature")
+	pkger.Include("/internal/sshaccess/sshaccess.feature")
+	pkger.Include("/internal/useraccount/useraccount.feature")
 }
