@@ -62,4 +62,5 @@ func (ctx *ubuntu) setEnvAndDefaults() {
 	setter.SetVar(&ctx.Password, "PROBR_UBUNTU_PASSWORD", "password@123")
 	setter.SetVar(&ctx.Username, "PROBR_UBUNTU_USERNAME", "ansibleuser")
 	setter.SetVar(ctx.Port, "PROBR_UBUNTU_PORT", "22")
+	setter.SetVar(&ctx.Pass, "PROBR_PASS_WIREFRAME_TESTS", "true")
 }

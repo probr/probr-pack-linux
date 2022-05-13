@@ -1,5 +1,5 @@
 // Package welcome provides the implementation required to execute the BDD tests described in container_registry_access.feature file
-package ubuntu
+package network
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func (probe probeStruct) Name() string {
 	// The return value for `Name` should match the probe directory
 	// and it's feature file, so each may be properly addressed for
 	// packing and opening the files.
-	return "ubuntu"
+	return "network"
 }
 
 // Path presents the path of these feature files for external reference
@@ -68,8 +68,9 @@ func (probe probeStruct) ScenarioInitialize(ctx *godog.ScenarioContext) {
 
 	// Background
 	ctx.Step("^an Ubuntu VM must be up$", scenario.givenAnUbuntuVMMustBeUp)
-	ctx.Step(`^ensure SSH root login is disabled$`, scenario.ensureSSHRootLoginIsDisabled)
-	ctx.Step(`^Ensure ufw firewall is configured`, scenario.ensureUfwFirewallIsConfigured)
+	ctx.Step(`^run "([^"]*)" and then output is  "([^"]*)"$`, scenario.runCommandAndVerify)
+
+	//^run "([^"]*)" and then output is  "([^"]*)"$
 
 	ctx.AfterStep(func(st *godog.Step, err error) {
 		scenario.currentStep = ""

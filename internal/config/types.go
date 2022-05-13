@@ -19,4 +19,5 @@ type ubuntu struct {
 	Username      string   `yaml:"Username"`
 	TagInclusions []string `yaml:"TagInclusions"`
 	TagExclusions []string `yaml:"TagExclusions"`
+	Pass          string   `yaml:"Pass"`
 }
